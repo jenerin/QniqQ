@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "studentId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "student", "staff"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "studentId", "role"]
+    },
+    "departments": {
+      "title": "Department",
+      "description": "University departments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "maxWindows": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] }
+      },
+      "required": ["id", "code", "name"]
+    },
+    "services": {
+      "title": "Service",
+      "description": "Services offered by departments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "deptId": { "type": "string" },
+        "name": { "type": "string" },
+        "avgDuration": { "type": "number" }
+      },
+      "required": ["id", "deptId", "name"]
+    },
+    "tickets": {
+      "title": "Ticket",
+      "description": "Queue tickets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketNumber": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "deptId": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "status": { "type": "string", "enum": ["waiting", "called", "in service", "completed", "no-show", "cancelled"] },
+        "estimatedWait": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "calledAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "ticketNumber", "studentId", "deptId", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profile documents"
+    },
+    "/departments/{deptId}": {
+      "schema": "departments",
+      "description": "Department configuration"
+    },
+    "/services/{serviceId}": {
+      "schema": "services",
+      "description": "Service definitions"
+    },
+    "/tickets/{ticketId}": {
+      "schema": "tickets",
+      "description": "Queue ticket documents"
+    }
+  }
+}

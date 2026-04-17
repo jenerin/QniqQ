@@ -1,0 +1,6 @@
+{
+  "name": "QR-Sync Dashboard",
+  "description": "A modern QR code generation dashboard with a frosted glass aesthetic.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}

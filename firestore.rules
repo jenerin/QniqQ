@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (auth.uid)
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required)
+    //   - displayName: string
+    //   - role: string ('admin', 'student', 'staff')
+    //   - createdAt: timestamp
+    //
+    // Collection: departments
+    // Document ID: deptId
+    // Fields:
+    //   - id, code, name, location, maxWindows, status
+    //
+    // Collection: tickets
+    // Document ID: ticketId
+    // Fields:
+    //   - id, ticketNumber, studentId, studentName, deptId, serviceId, status, estimatedWait, createdAt
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (getUserData().role == 'admin' || request.auth.token.email == "jennelynabilong22@gmail.com");
+    }
+    
+    function isStaff() {
+      return isAuthenticated() && getUserData().role == 'staff';
+    }
+    
+    function isStudent() {
+      return isAuthenticated() && getUserData().role == 'student';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) || isAdmin();
+    }
+
+    match /departments/{deptId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /tickets/{ticketId} {
+      allow read: if isAuthenticated();
+      allow create: if isStudent() || isAdmin();
+      allow update: if isAdmin() || isStaff() || (isStudent() && resource.data.studentId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+  }
+}
